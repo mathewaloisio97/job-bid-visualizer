@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" class="h-full bg-slate-100">
+  <head>
+    <!--
+      @file public/index.html
+      @description Primary Application Shell for the Procurement Bid Visualizer Single Page Application (SPA).
+      @module Client/Shell
+      
+      Developer Notes:
+      - Asset Pipeline: External dependencies (Tailwind CSS, Chart.js) are injected via CDN for lightweight distribution.
+      - Dynamic Views: Content inside #app-content is programmatically managed by /app.js module.
+      - Layout constraints: Uses CSS Grid / Flexbox sticky footer layout ensuring minimum full viewport coverage.
+    -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Real-time ERP Procurement & Bid Metrics Visualization Dashboard"
+    />
+    <meta name="theme-color" content="#4f46e5" />
+
+    <title>Bid Visualizer Dashboard | Procurement Middleware</title>
+
+    <!-- Third-Party CDN Dependencies -->
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js Visualization Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom View Transition Styles -->
+    <style>
+      /**
+         * SPA View Transition States
+         * Managed by client-side router during view swapping.
+         */
+      #app-content {
+        transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: opacity;
+      }
+      .fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .fade-in {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-full flex flex-col bg-slate-100 text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white"
+  >
+    <!-- Primary Navigation Header -->
+    <header
+      class="bg-indigo-600 text-white shadow-md py-4 px-6 flex justify-between items-center z-10"
+    >
+      <div class="flex items-center gap-3">
+        <h1 class="text-xl font-bold tracking-wide">Procurement Visualizer</h1>
+        <span
+          class="text-xs bg-indigo-500/50 border border-indigo-400/40 text-indigo-100 px-2 py-0.5 rounded font-mono uppercase tracking-wider"
+          >v1.0</span
+        >
+      </div>
+
+      <!-- Dynamic Real-time Ingestion / Health Indicator -->
+      <div
+        id="connection-status"
+        class="text-sm font-medium bg-indigo-800/80 border border-indigo-700/60 py-1.5 px-3.5 rounded-full flex items-center gap-2.5 shadow-inner transition-colors duration-300"
+        aria-live="polite"
+        aria-label="Data Stream Connection Status"
+      >
+        <span
+          id="status-dot"
+          class="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse transition-colors duration-300"
+          aria-hidden="true"
+        ></span>
+        <span id="status-text">Waiting for Data</span>
+      </div>
+    </header>
+
+    <!-- Main Content Container (SPA Portal) -->
+    <main class="flex-grow p-6 max-w-7xl mx-auto w-full flex flex-col">
+      <!-- Dynamic Breadcrumb Navigation -->
+      <!-- Populated via Client Router (e.g., Home > Portfolio > Bid Snapshot #1042) -->
+      <nav
+        id="breadcrumbs"
+        aria-label="Breadcrumb navigation"
+        class="mb-6 text-sm text-slate-500 font-medium hidden flex items-center gap-2"
+      >
+        <!-- Dynamic Inject Root -->
+      </nav>
+
+      <!-- Dynamic View Renderer Target -->
+      <!-- All application views (Charts, Data Tables, Error States) are dynamically mounted here -->
+      <div id="app-content" class="fade-in flex-grow flex flex-col justify-center">
+        <!-- Default / Fallback State: Awaiting Initial Data Ingestion -->
+        <section
+          aria-labelledby="empty-state-title"
+          class="text-center my-auto py-12 px-4 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50"
+        >
+          <svg
+            class="w-16 h-16 mx-auto mb-4 text-slate-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+            />
+          </svg>
+          <h2 id="empty-state-title" class="text-lg font-semibold text-slate-700">
+            No ERP Data Loaded
+          </h2>
+          <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">
+            The visualization middleware is currently waiting for a bid snapshot payload.
+          </p>
+          <div
+            class="mt-4 inline-flex items-center gap-2 bg-slate-200/80 text-slate-700 text-xs font-mono px-3 py-1.5 rounded-md border border-slate-300 shadow-sm"
+          >
+            <span>Terminal:</span>
+            <code class="font-bold text-indigo-700">npm run test:snapshot</code>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Client Application Entrypoint -->
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\""
+    "format": "prettier --write \"**/*.{ts,js,mjs}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,mjs}\"",
+    "test:snapshot": "node scripts/test-snapshot.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",

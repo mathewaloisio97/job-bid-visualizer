@@ -1,6 +1,8 @@
 /**
  * @fileoverview Main Express application entry point for the Job Bid Visualizer middleware.
- * Configures application routes, static asset serving, and state handling.
+ * Handles ERP data ingestion, state management, static asset serving, and real-time Server-Sent Events (SSE) broadcasting.
+ *
+ * @module Server
  */
 
 import cors from 'cors';
@@ -19,21 +21,25 @@ const upload = multer();
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files from root public directory
+// Serve static frontend assets from public root.
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 const authAdapter = new MockAuthAdapter();
 const vizAdapter = new VisualizationAdapter();
 
 /**
- * In-Memory state store for the stateless demo flow.
- * Stores the most recently ingested dashboard payload.
+ * In-Memory state store holding the most recent portfolio dashboard snapshot payload.
  */
 let latestDashboardState: unknown = null;
 
 /**
- * Express middleware that attaches a unique request ID to `/api` route headers
- * and logs basic access information.
+ * Registry of active Server-Sent Events (SSE) client response channels for real-time broadcasts.
+ */
+let sseClients: Response[] = [];
+
+/**
+ * Express middleware attaching a unique request ID header (`x-request-id`)
+ * and logging API route access details.
  */
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.path.startsWith('/api')) {
@@ -57,8 +63,8 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
 /**
  * POST /api/v1/visualizer/snapshot
  *
- * Primary real-time ingestion endpoint for processing ERP CSV bid exports into dashboard payloads.
- * Caches the generated state in memory upon completion.
+ * Ingestion endpoint for ERP CSV bid uploads. Processes records, refreshes global in-memory state,
+ * and immediately broadcasts updated dashboards to all connected SSE clients.
  */
 app.post(
   '/api/v1/visualizer/snapshot',
@@ -67,15 +73,16 @@ app.post(
   csvIngestMiddleware,
   (req: Request, res: Response) => {
     const { records, ingestErrors } = req.body;
-
-    // Transform flat validated records into UI-ready metrics hierarchy.
     const portfolioDashboard = vizAdapter.buildPortfolioDashboard(records);
 
-    // Store latest snapshot in memory for the frontend to consume
     latestDashboardState = portfolioDashboard;
 
+    // Broadcast updated payload to all active SSE subscribers instantly.
+    const payload = `data: ${JSON.stringify(portfolioDashboard)}\n\n`;
+    sseClients.forEach((client) => client.write(payload));
+
     res.json({
-      message: 'Dashboard data successfully refreshed.',
+      message: 'Dashboard data successfully refreshed and broadcasted to clients.',
       meta: {
         requestId: req.headers['x-request-id'],
         totalValidBids: records.length,
@@ -88,17 +95,30 @@ app.post(
 );
 
 /**
- * GET /api/v1/visualizer/data
+ * GET /api/v1/visualizer/stream
  *
- * Frontend retrieval endpoint for fetching the currently cached dashboard state.
+ * Real-time Server-Sent Events (SSE) streaming endpoint.
+ * Immediately pushes cached state upon connection and registers client channels for future updates.
  */
-app.get('/api/v1/visualizer/data', (req: Request, res: Response) => {
-  if (!latestDashboardState) {
-    return res
-      .status(404)
-      .json({ error: 'No snapshot data available. Please push ERP data first.' });
+app.get('/api/v1/visualizer/stream', (req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Connection', 'keep-alive');
+
+  // Instantly establish the connection stream.
+  res.flushHeaders();
+
+  // Push existing state immediately on initial client handshake if available.
+  if (latestDashboardState) {
+    res.write(`data: ${JSON.stringify(latestDashboardState)}\n\n`);
   }
-  res.json(latestDashboardState);
+
+  sseClients.push(res);
+
+  // Clean up client reference on socket disconnect / browser tab closure.
+  req.on('close', () => {
+    sseClients = sseClients.filter((client) => client !== res);
+  });
 });
 
 app.listen(port, () => {

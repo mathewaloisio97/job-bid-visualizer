@@ -9,7 +9,9 @@
     "start": "npm run build:client && tsx src/server.ts",
     "format": "prettier --write \"**/*.{ts,js,mjs}\"",
     "format:check": "prettier --check \"**/*.{ts,js,mjs}\"",
-    "test:snapshot": "node scripts/test-snapshot.mjs"
+    "test:snapshot": "node scripts/test-snapshot.mjs",
+    "test:livedata": "node scripts/test-livedata.mjs",
+    "test:removerow": "node scripts/test-removerow.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",

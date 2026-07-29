@@ -1,6 +1,6 @@
 /**
  * @fileoverview Chart rendering service for the Job Bid Visualizer client.
- * Handles Chart.js initialization, scatter plot mapping, color coding by status,
+ * Handles Chart.js initialization, scatter plot mapping, color coding by vendor,
  * and canvas teardown/re-render lifecycle management.
  *
  * @module Charts
@@ -52,6 +52,7 @@ export function renderChart(bids, canvasId) {
       ],
     },
     options: {
+      animation: false, // Disables Chart.js entry animations to allow instant snap updates during live data streaming.
       responsive: true,
       maintainAspectRatio: false,
       plugins: {

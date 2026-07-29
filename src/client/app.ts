@@ -1,7 +1,7 @@
 /**
  * @fileoverview Main client-side application controller for the Job Bid Visualizer SPA.
  * Manages UI lifecycle rendering, view transition animations, global event delegation
- * for router navigation, filter bindings, and backend synchronization callbacks.
+ * for router navigation, checkbox/input filter bindings, and backend synchronization callbacks.
  *
  * @module App
  */
@@ -63,11 +63,28 @@ function render(): void {
 
 /**
  * Global Click Event Delegation listener.
- * Handles client-side routing across projects, job scopes, and breadcrumb navigation.
+ * Handles client-side routing across projects, job scopes, "Show All" vendor resets, and breadcrumb navigation.
  */
 document.addEventListener('click', (e: MouseEvent) => {
   const target = e.target as HTMLElement | null;
   if (!target) return;
+
+  // Breadcrumb and Header Router Navigation Actions
+  // Evaluating closest [data-nav] first handles nested element clicks and prevents scroll jumping on <a> tags.
+  const navItem = target.closest('[data-nav]') as HTMLElement | null;
+  if (navItem) {
+    e.preventDefault();
+    const navTarget = navItem.dataset.nav;
+
+    if (navTarget === 'projects') {
+      state.currentView = 'projects';
+      render();
+    } else if (navTarget === 'jobs') {
+      state.currentView = 'jobs';
+      render();
+    }
+    return;
+  }
 
   // Card Selection: Navigate to Project Scopes
   const projectCard = target.closest('[data-project-id]') as HTMLElement | null;
@@ -78,29 +95,43 @@ document.addEventListener('click', (e: MouseEvent) => {
     return;
   }
 
-  // Card Selection: Navigate to Bids Comparison Dashboard
+  // Card Selection: Navigate to Bids Comparison Dashboard and initialize default filter sets
   const jobCard = target.closest('[data-job-id]') as HTMLElement | null;
   if (jobCard) {
     state.selectedJobId = jobCard.dataset.jobId || null;
     state.currentView = 'bids';
-    state.filters = { maxCost: null, maxDate: null }; // Reset active filters on job switch.
+
+    const project = state.data.find((p) => p.projectId === state.selectedProjectId);
+    const job = project?.jobs.find((j) => j.jobId === state.selectedJobId);
+
+    if (job) {
+      state.filters = {
+        maxCost: null,
+        maxDate: null,
+        vendors: Array.from(new Set(job.bids.map((b) => b.vendorName))),
+        statuses: ['accepted', 'pending', 'declined'],
+      };
+    }
+
     render();
     return;
   }
 
-  // Breadcrumb Router Navigation Actions
-  if (target.dataset.nav === 'projects') {
-    state.currentView = 'projects';
-    render();
-  } else if (target.dataset.nav === 'jobs') {
-    state.currentView = 'jobs';
-    render();
+  // Filter Action: Select/Show All Vendors
+  if (target.id === 'btn-show-all-vendors') {
+    const project = state.data.find((p) => p.projectId === state.selectedProjectId);
+    const job = project?.jobs.find((j) => j.jobId === state.selectedJobId);
+    if (job) {
+      state.filters.vendors = Array.from(new Set(job.bids.map((b) => b.vendorName)));
+      render();
+    }
+    return;
   }
 });
 
 /**
  * Global Input Event Delegation listener.
- * Dynamically binds filter controls (max cost and date limits) to state and re-renders.
+ * Dynamically binds numerical and date filter controls (max cost and date limits) to state and re-renders.
  */
 document.addEventListener('input', (e: Event) => {
   const target = e.target as HTMLInputElement | null;
@@ -116,14 +147,38 @@ document.addEventListener('input', (e: Event) => {
 });
 
 /**
+ * Global Change Event Delegation listener.
+ * Manages checkbox state for vendor and status filters.
+ */
+document.addEventListener('change', (e: Event) => {
+  const target = e.target as HTMLInputElement | null;
+  if (!target) return;
+
+  if (target.classList.contains('filter-vendor')) {
+    if (target.checked && !state.filters.vendors.includes(target.value)) {
+      state.filters.vendors.push(target.value);
+    } else if (!target.checked) {
+      state.filters.vendors = state.filters.vendors.filter((v) => v !== target.value);
+    }
+    render();
+  } else if (target.classList.contains('filter-status')) {
+    if (target.checked && !state.filters.statuses.includes(target.value)) {
+      state.filters.statuses.push(target.value);
+    } else if (!target.checked) {
+      state.filters.statuses = state.filters.statuses.filter((s) => s !== target.value);
+    }
+    render();
+  }
+});
+
+/**
  * Callback handler invoked by the SSE stream when fresh ERP snapshot data is received.
  * Updates header connection status indicator securely and triggers UI view render.
  */
 function onDataReceived(): void {
   if (statusContainer) {
-    // Safely replace the entire inner HTML to avoid fragile childNodes indexing.
     statusContainer.innerHTML =
-      '<span class="w-2 h-2 rounded-full bg-emerald-400" id="status-dot"></span> Live Synced';
+      '<span class="w-2 h-2 rounded-full bg-emerald-400" id="status-dot"></span> Data Received';
   }
   render();
 }

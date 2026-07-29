@@ -5,10 +5,13 @@ PROJ-701,JOB-FND-01,Foundation Excavation,BID-906,SolidGround LLC,"$11,500.50",2
 PROJ-701,JOB-FRM-02,Framing Package,BID-903,Apex Lumber,"$45,200.50",2026-08-20,14,accepted
 PROJ-701,JOB-PLM-03,Plumbing Rough-In,BID-907,FlowMaster LLC,"$8,400.00",2026-09-05,4,pending
 PROJ-701,JOB-PLM-03,Plumbing Rough-In,BID-908,PipeWorks Co.,"$8,900.00",2026-09-03,3,pending
+PROJ-701,JOB-PLM-03,Plumbing Rough-In,BID-915,RapidPipe LLC,"$6,200.00",2026-08-28,2,revoked
 PROJ-702,JOB-ELE-01,Electrical Rough-In,BID-904,Sparky Bros,"$8,100.00",2026-08-15,3,pending
 PROJ-702,JOB-ELE-01,Electrical Rough-In,BID-905,Current Logic,"$7,950.00",2026-08-18,4,declined
 PROJ-702,JOB-ELE-01,Electrical Rough-In,BID-909,VoltMaster Inc.,"$7,800.00",2026-08-15,3,accepted
 PROJ-702,JOB-HVAC-02,HVAC System Install,BID-910,ClimateControl Pro,"$14,200.00",2026-08-22,5,accepted
+PROJ-702,JOB-HVAC-02,HVAC System Install,BID-916,AirTech Solutions,"$15,800.00",2026-08-25,7,pending
+PROJ-702,JOB-HVAC-02,HVAC System Install,BID-917,Breeze Dynamics,"$16,500.00",2026-09-01,6,pending
 PROJ-703,JOB-DRY-01,Drywall & Insulation,BID-911,SmoothWall Inc.,"$22,100.00",2026-09-01,10,pending
 PROJ-703,JOB-DRY-01,Drywall & Insulation,BID-912,All-In Drywall,"$20,900.00",2026-09-05,12,accepted
 PROJ-703,JOB-PNT-02,Interior Painting,BID-913,FreshCo Paints,"$9,500.00",2026-09-15,5,pending

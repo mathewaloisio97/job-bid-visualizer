@@ -26,22 +26,41 @@ export interface Bid {
   /** Projected completion date quoted by the vendor (ISO 8601 formatted string: "YYYY-MM-DD"). */
   estimatedFinishDate: string;
 
+  /** Earliest date the vendor can commence work (ISO 8601 formatted string: "YYYY-MM-DD"). Optional. */
+  earliestStartDate?: string;
+
   /** Estimated total duration required to complete work, measured in calendar days. */
   timeEstimateDays: number;
 }
 
 /**
- * Calculated aggregate metrics derived across all valid bids submitted for a single job.
+ * Wrapper structure pairing a metric value with its associated vendor name.
+ *
+ * @template T - The type of the metric value (e.g., number for cost/duration, string for date).
+ */
+export interface MetricDetail<T> {
+  /** Calculated metric value. */
+  value: T;
+
+  /** Name of the vendor associated with this metric benchmark. */
+  vendorName: string;
+}
+
+/**
+ * Calculated aggregate metrics derived across all valid bids submitted for a single job scope.
  */
 export interface JobMetrics {
-  /** Lowest cost estimate submitted across all active bids for the job. */
-  lowestCost: number;
+  /** Lowest cost estimate submitted across active bids and its associated vendor, or null if no bids exist. */
+  lowestCost: MetricDetail<number> | null;
 
-  /** Earliest estimated finish date among all active bids (ISO 8601 formatted string: "YYYY-MM-DD"). */
-  soonestStart: string;
+  /** Earliest start date among active bids and its associated vendor (ISO 8601 string: "YYYY-MM-DD"), or null if unavailable. */
+  soonestStart: MetricDetail<string> | null;
 
-  /** Shortest execution duration in days across all active bids. */
-  fastestDuration: number;
+  /** Shortest execution duration in calendar days and its associated vendor, or null if no bids exist. */
+  fastestDuration: MetricDetail<number> | null;
+
+  /** Total count of bids currently marked as accepted for this job. */
+  acceptedCount: number;
 }
 
 /**
@@ -81,6 +100,12 @@ export interface Filters {
 
   /** Upper completion date threshold for bid filtering. Null if no time limit is set. */
   maxDate: Date | null;
+
+  /** Array of selected vendor names to filter bids by. Empty array means no vendor filter applied. */
+  vendors: string[];
+
+  /** Array of selected proposal statuses (e.g., ["ACCEPTED", "PENDING"]) to filter bids by. Empty array means all statuses included. */
+  statuses: string[];
 }
 
 /**

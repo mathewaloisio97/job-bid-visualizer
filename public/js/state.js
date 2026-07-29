@@ -20,6 +20,8 @@ export const state = {
   filters: {
     maxCost: null,
     maxDate: null,
+    vendors: [],
+    statuses: ['accepted', 'pending', 'declined'],
   },
   /** Active Chart.js instance reference for lifecycle management. */
   chartInstance: null,

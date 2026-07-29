@@ -8,7 +8,7 @@
       
       Developer Notes:
       - Asset Pipeline: External dependencies (Tailwind CSS, Chart.js) are injected via CDN for lightweight distribution.
-      - Dynamic Views: Content inside #app-content is programmatically managed by /app.js module.
+      - Dynamic Views: Content inside #app-content is programmatically managed by /js/app.js module.
       - Layout constraints: Uses CSS Grid / Flexbox sticky footer layout ensuring minimum full viewport coverage.
     -->
     <meta charset="UTF-8" />
@@ -28,9 +28,9 @@
     <!-- Custom View Transition Styles -->
     <style>
       /**
-         * SPA View Transition States
-         * Managed by client-side router during view swapping.
-         */
+       * SPA View Transition States
+       * Managed by client-side router during view swapping.
+       */
       #app-content {
         transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
         will-change: opacity;
@@ -52,10 +52,19 @@
       class="bg-indigo-600 text-white shadow-md py-4 px-6 flex justify-between items-center z-10"
     >
       <div class="flex items-center gap-3">
-        <h1 class="text-xl font-bold tracking-wide">Job Bid Visualizer</h1>
+        <!-- Interactive App Header Title (Acts as Home / Projects Nav Link) -->
+        <h1
+          data-nav="projects"
+          class="text-xl font-bold tracking-wide cursor-pointer hover:text-indigo-200 transition-colors"
+          role="button"
+          tabindex="0"
+          aria-label="Navigate to Home"
+        >
+          Job Bid Visualizer
+        </h1>
         <span
           class="text-xs bg-indigo-500/50 border border-indigo-400/40 text-indigo-100 px-2 py-0.5 rounded font-mono uppercase tracking-wider"
-          >v1.0</span
+          >v1.0.0</span
         >
       </div>
 

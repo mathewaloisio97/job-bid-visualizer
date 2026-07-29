@@ -5,6 +5,7 @@
  *
  * @module Charts
  */
+import { getVendorColor } from './colors.js';
 import { state } from './state.js';
 /**
  * Color mapping configuration corresponding to bid status states.
@@ -44,9 +45,7 @@ export function renderChart(bids, canvasId) {
         {
           label: 'Vendor Bids',
           data: dataPoints,
-          backgroundColor: dataPoints.map(
-            (p) => STATUS_COLOR_MAP[p.status] || STATUS_COLOR_MAP['pending']
-          ),
+          backgroundColor: dataPoints.map((p) => getVendorColor(p.vendor)),
           pointRadius: 8,
           pointHoverRadius: 10,
         },

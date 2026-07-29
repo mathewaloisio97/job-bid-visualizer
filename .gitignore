@@ -1,0 +1,55 @@
+# ==============================================================================
+# Dependency directories (pnpm specific)
+# ==============================================================================
+node_modules/
+.pnpm-debug.log*
+
+# ==============================================================================
+# Build & Output directories (Vite & SCORM default outputs)
+# ==============================================================================
+dist/
+build/
+out/
+*.zip
+*.tar.gz
+
+# ==============================================================================
+# IDEs and Editors
+# ==============================================================================
+# Ignore general VS Code state, but KEEP the settings.json
+.vscode/*
+!.vscode/settings.json
+.history/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# IntelliJ/WebStorm
+.idea/
+
+# OS-specific temporary files
+.DS_Store
+Thumbs.db
+
+# ==============================================================================
+# TypeScript & Compiler caches
+# ==============================================================================
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# ==============================================================================
+# Environment variables (Highly sensitive, never commit these!)
+# ==============================================================================
+.env
+.env.*
+!.env.example
+
+# =========================
+# AI Files
+# =========================
+**/project_bundle.txt
+**/bundle_project.ps1
+**/*_project_bundle.txt
